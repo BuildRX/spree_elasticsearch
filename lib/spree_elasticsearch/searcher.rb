@@ -127,7 +127,9 @@ module SpreeElasticsearch
         when 'name_asc'
           scope = scope.order(name: :asc)
         else
-          scope = scope.order("taxon_positions.#{@properties[:taxon]}")
+          if @properties[:taxon]
+            scope = scope.order("taxon_positions.#{@properties[:taxon]}")
+          end
       end
 
       scope = scope.limit(@properties[:per_page]).offset(@properties[:offset])
