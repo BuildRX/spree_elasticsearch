@@ -3,7 +3,7 @@ class ProductsIndex < Chewy::Index
     field :name
     field :description
     field :image_url, type: 'string', value: ->(product){ product.image && product.image.attachment.url(:listing) }
-    field :price, type: 'float', value: ->(product){ product.price.to_f }
+    field :price, type: 'float', value: ->(product){ product.master.price.to_f }
     field :slug, type: 'string'
     field :facet_properties, type: 'object', value: ->(product){ product.facet_properties }
     field :taxons, value: ->(product){
