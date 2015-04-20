@@ -6,7 +6,9 @@ module Spree
       facet_props = {}
 
       product_properties.each do |prod_prop|
-        facet_props[prod_prop.property.id] = prod_prop.value
+        if prod_prop.property
+          facet_props[prod_prop.property.id] = prod_prop.value
+        end
       end
 
       facet_props
