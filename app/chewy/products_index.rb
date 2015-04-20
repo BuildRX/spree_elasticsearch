@@ -6,6 +6,7 @@ class ProductsIndex < Chewy::Index
     field :price, type: 'float', value: ->(product){ product.master.price.to_f }
     field :slug, type: 'string'
     field :facet_properties, type: 'object', value: ->(product){ product.facet_properties }
+    field :facet_options, type: 'object', value: ->(product){ product.facet_options }
     field :taxons, value: ->(product){
       taxons = []
       product.taxons.map{|t| taxons.push(*t.self_and_ancestors.map(&:id))}
