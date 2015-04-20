@@ -71,7 +71,7 @@ module SpreeElasticsearch
         property_ids = prop.split(',')
         scope = scope.filter {
           property_ids.map { |k|
-            send('facet_properties').send(k.to_s, :or) == val.map(&:to_i)
+            send('facet_properties').send(k.to_s, :or) == val
           }.reduce do |memo, o| memo | o end
         }
       end
@@ -92,6 +92,8 @@ module SpreeElasticsearch
           scope = scope.order(price: :asc)
         when 'time_desc'
           scope = scope.order(available_on: :desc)
+        when 'name_asc'
+          scope = scope.order(name: :asc)
         else
           scope = scope.order("taxon_positions.#{@properties[:taxon]}")
       end
