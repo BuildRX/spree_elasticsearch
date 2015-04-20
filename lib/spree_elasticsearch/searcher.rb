@@ -28,7 +28,8 @@ module SpreeElasticsearch
     end
 
     def base_scope
-      scope = ProductsIndex
+      time_now = DateTime.now.to_i
+      scope = ProductsIndex.filter { available_on < time_now }
       if @properties[:taxon]
         taxon_id = @properties[:taxon]
         scope = scope.filter { taxons == taxon_id }
