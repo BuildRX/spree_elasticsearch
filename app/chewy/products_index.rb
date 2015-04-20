@@ -1,5 +1,5 @@
 class ProductsIndex < Chewy::Index
-  define_type Spree::Product.includes(:taxons, :master, :prices, {:product_properties => :property}) do
+  define_type Spree::Product.includes(:taxons, :master, {:product_properties => :property}) do
     field :name
     field :description
     field :image_url, type: 'string', value: ->(product){ product.image && product.image.attachment.url(:listing) }
