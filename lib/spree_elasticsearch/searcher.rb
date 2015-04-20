@@ -1,5 +1,9 @@
 module SpreeElasticsearch
   class Searcher
+    attr_accessor :properties
+    attr_accessor :current_user
+    attr_accessor :current_currency
+
     def initialize params
       @properties = {}
       if params[:taxon]
@@ -22,8 +26,8 @@ module SpreeElasticsearch
     def base_scope
       scope = ProductsIndex
       if @properties[:taxon]
-        taxon = @properties[:taxon]
-        scope = scope.filter{ (taxon_lft >= taxon.lft) & (taxon_lft < taxon.rgt) }
+        taxon_id = @properties[:taxon]
+        scope = scope.filter { taxons == taxon_id }
         if @properties[:location]
           scope = scope.filter( geo_distance: {distance: "100miles", location: @properties[:location]} )
         end
@@ -81,11 +85,6 @@ module SpreeElasticsearch
         scope = scope.filter(geo_distance: {distance: "#{@properties[:distance]}miles", location: @properties[:location]})
       end
 
-      if @properties[:status]
-        query_status = @properties[:status]
-        scope = scope.filter{ status == query_status }
-      end
-
       case @properties[:sort]
         when 'price_desc'
           scope = scope.order(price: :desc)
@@ -94,10 +93,12 @@ module SpreeElasticsearch
         when 'time_desc'
           scope = scope.order(available_on: :desc)
         else
-          scope = scope.order(Spree::Product.in_taxon(@properties[:taxon]).values[:order])
+          scope = scope.order("taxon_positions.#{@properties[:taxon]}")
       end
 
-      scope.limit(@properties[:per_page]).offset(@properties[:offset])
+      scope = scope.limit(@properties[:per_page]).offset(@properties[:offset])
+
+      scope.only(:id).load
     end
 
     def facet_config
@@ -116,7 +117,7 @@ module SpreeElasticsearch
       end
 
       # Filtering
-      [:price_min, :price_max, :keywords, :distance, :status].each do |key|
+      [:price_min, :price_max, :keywords, :distance].each do |key|
         if params[key].present?
           @properties[key] = params[key]
         end
